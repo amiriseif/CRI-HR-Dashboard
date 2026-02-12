@@ -4,7 +4,8 @@ namespace HRDashboard.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public String Fullname { get; set; }
-        public String ProfilePicture { get; set; }
+        public required String FullName { get; set; }
+        
+        public required String ProfilePicture { get; set; }
     }
 }

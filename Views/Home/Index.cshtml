@@ -1,8 +1,366 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HRDashboard.Models.HomeStatsViewModel
+
+@{
+    ViewData["Title"] = "Dashboard - Robotique Club ISAMM HR";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Welcome Popup -->
+@if (TempData["ShowWelcome"] != null && (bool)TempData["ShowWelcome"])
+{
+    <div id="welcomePopup" class="welcome-overlay">
+        <div class="welcome-popup glass-card">
+            <div class="welcome-content text-center">
+                @{
+                    var profilePic = User?.FindFirst("ProfilePicture")?.Value;
+                    if (!string.IsNullOrEmpty(profilePic))
+                    {
+                        <img src="@profilePic" alt="Profile" class="profile-image rounded-circle mb-4" style="width: 100px; height: 100px; object-fit: cover; border: 4px solid #00d4ff;" />
+                    }
+                    else
+                    {
+                        <div class="avatar-placeholder mb-4">
+                            <i class="fas fa-user-astronaut fa-5x"></i>
+                        </div>
+                    }
+                }
+                <h2 class="neon-text mb-3">
+                    <i class="fas fa-hand-sparkles welcome-icon me-2"></i>
+                    Welcome Dear @TempData["UserRole"]
+                </h2>
+                <h4 class="text-light opacity-90 mb-3">@TempData["WelcomeUser"]</h4>
+                <p class="text-cyan mb-4">
+                    <i class="fas fa-check-circle me-2"></i>
+                    You have successfully logged in to the HR Dashboard
+                </p>
+                <button class="btn btn-outline-cyan btn-sm" onclick="closeWelcome()">Continue</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Main Dashboard -->
+<div class="dashboard-container min-vh-100 pb-5">
+    <!-- Header -->
+    <header class="dashboard-header glass-header mb-5">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h3 class="mb-0 neon-text">
+                <i class="fas fa-robot me-2"></i>
+                @Model.Title
+            </h3>
+            <p class="text-muted mb-0 small">
+                <i class="far fa-calendar-alt me-2"></i>
+                @DateTime.Now.ToString("dddd, MMMM dd, yyyy")
+            </p>
+        </div>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="row g-4">
+        <!-- Members by Location -->
+        <div class="col-md-4">
+            <div class="glass-card stat-card h-100">
+                <h5 class="card-title neon-subtitle">Members by Location</h5>
+                <div class="content-wrapper">
+                    @if (!Model.MembersByLocation.Any())
+                    {
+                        <div class="text-muted fst-italic">No members registered yet</div>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled mb-0 stats-list">
+                            @foreach (var item in Model.MembersByLocation.Take(8))
+                            {
+                                <li class="d-flex justify-content-between py-2 align-items-baseline">
+                                    <span class="text-truncate me-3" title="@item.Key" style="flex: 1;">@item.Key</span>
+                                    <strong class="text-cyan">@item.Count</strong>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Cotisation Status -->
+        <div class="col-md-4">
+            <div class="glass-card stat-card h-100">
+                <h5 class="card-title neon-subtitle">Cotisation Status</h5>
+                <div class="content-wrapper">
+                    @if (!Model.CotisationPercentages.Any())
+                    {
+                        <div class="text-muted fst-italic">No contribution data</div>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled mb-0 stats-list">
+                            @foreach (var p in Model.CotisationPercentages)
+                            {
+                                <li class="d-flex justify-content-between py-2 align-items-baseline">
+                                    <span class="text-truncate me-3" title="@p.Key" style="flex: 1;">@p.Key</span>
+                                    <strong class="text-purple">@p.Count</strong>
+                                    <small class="text-muted ms-2">(@p.Percentage%)</small>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Overdue Tasks -->
+        <div class="col-md-4">
+            <div class="glass-card stat-card h-100 text-center d-flex flex-column justify-content-center">
+                <h5 class="card-title neon-subtitle">Overdue Tasks</h5>
+                <div class="display-4 fw-bold text-danger mb-2">@Model.OverdueTasksCount</div>
+                <small class="text-muted">Past deadline & not completed</small>
+            </div>
+        </div>
+
+        <!-- Department Member Counts -->
+        <div class="col-12">
+            <div class="glass-card stat-card">
+                <h5 class="card-title neon-subtitle">Department Member Counts</h5>
+                <div class="content-wrapper">
+                    @if (!Model.DepartmentCounts.Any())
+                    {
+                        <div class="text-muted fst-italic">No department data</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-sm mb-0 futuristic-table">
+                                <thead>
+                                    <tr>
+                                        <th>Department</th>
+                                        <th class="text-end">Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var d in Model.DepartmentCounts)
+                                    {
+                                        <tr>
+                                            <td class="text-truncate" title="@d.Key" style="max-width: 300px;">@d.Key</td>
+                                            <td class="text-end fw-bold text-cyan">@d.Count</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Trainings -->
+        <div class="col-12">
+            <div class="glass-card stat-card">
+                <h5 class="card-title neon-subtitle">Upcoming Trainings</h5>
+                <div class="content-wrapper">
+                    @if (!Model.UpcomingWorkshops.Any())
+                    {
+                        <div class="text-muted fst-italic">No upcoming sessions</div>
+                    }
+                    else
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var u in Model.UpcomingWorkshops)
+                            {
+                                <li class="py-3 border-bottom border-secondary border-opacity-25 last:border-0">
+                                    <strong class="text-light d-block mb-1">@u.Subject</strong>
+                                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                                        <span class="text-info">
+                                            <i class="far fa-clock me-1"></i>
+                                            @u.ScheduledAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                                        </span>
+                                        @if (!string.IsNullOrWhiteSpace(u.MailSubject))
+                                        {
+                                            <small class="text-muted">@u.MailSubject</small>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Styles {
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --card-bg: rgba(20, 25, 40, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.09);
+            --neon-cyan: #00d4ff;
+            --neon-purple: #c678dd;
+            --neon-blue: #5e81ff;
+            --text: #e6e6fa;
+            --muted: #a0a8c0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e17 0%, #0f1623 100%);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        p, li, td, span, strong, small, h5, h4, h3, h2 {
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+            line-height: 1.5;
+        }
+
+        .glass-card, .glass-header {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover, .glass-header:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 212, 255, 0.15);
+        }
+
+        .neon-text {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .neon-subtitle {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
+            margin-bottom: 1.25rem;
+        }
+
+        .text-cyan { color: var(--neon-cyan); }
+        .text-purple { color: var(--neon-purple); }
+
+        .welcome-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-popup {
+            max-width: 460px;
+            width: 90%;
+            animation: popupFadeIn 0.7s ease-out;
+        }
+
+        @@keyframes popupFadeIn {
+            from { opacity: 0; transform: scale(0.82); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .avatar-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .content-wrapper {
+            padding: 1.25rem;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 420px;
+        }
+
+        .stats-list li {
+            transition: all 0.2s ease;
+        }
+
+        .stats-list li:hover {
+            background: rgba(0, 212, 255, 0.08);
+            border-radius: 8px;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .futuristic-table {
+            width: 100%;
+        }
+
+        .futuristic-table th {
+            color: var(--muted);
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.8px;
+            padding-bottom: 0.75rem;
+        }
+
+        .futuristic-table td {
+            padding: 0.6rem 0;
+            vertical-align: middle;
+        }
+
+        .futuristic-table td:first-child {
+            max-width: 320px;
+        }
+
+        .btn-outline-cyan {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            transition: all 0.3s;
+        }
+
+        .btn-outline-cyan:hover {
+            background: var(--neon-cyan);
+            color: var(--bg);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.7);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Welcome popup auto + manual close
+        window.addEventListener('DOMContentLoaded', () => {
+            const popup = document.getElementById('welcomePopup');
+            if (popup) {
+                setTimeout(() => {
+                    popup.style.opacity = '0';
+                    popup.style.transform = 'scale(0.92)';
+                    setTimeout(() => popup.style.display = 'none', 700);
+                }, 6000);
+            }
+        });
+
+        function closeWelcome() {
+            const popup = document.getElementById('welcomePopup');
+            if (popup) {
+                popup.style.opacity = '0';
+                popup.style.transform = 'scale(0.92)';
+                setTimeout(() => popup.style.display = 'none', 700);
+            }
+        }
+
+        // Smooth scrolling
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+}

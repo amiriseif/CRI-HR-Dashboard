@@ -10,10 +10,12 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute("Bootstrap5")]
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("6c3ec0ff-4e5c-4de5-8fdd-08e9fdb715c8")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("HRDashboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dfa79e06d3ca2d432d493626b4f237d9eb751c12")]
 [assembly: System.Reflection.AssemblyProductAttribute("HRDashboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HRDashboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

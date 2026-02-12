@@ -1,0 +1,92 @@
+@model HRDashboard.Models.Workshop
+
+@{
+    ViewData["Title"] = "Schedule Workshop";
+}
+
+<div class="container mt-3">
+    <h3>Schedule Workshop</h3>
+    <form id="wizard-form" asp-action="Create" method="post">
+        <div id="step-1" class="wizard-step">
+            <div class="mb-3">
+                <label class="form-label">Training subject</label>
+                <input name="Subject" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Trainer name</label>
+                <input name="Trainer" class="form-control" required />
+            </div>
+            <div>
+                <button type="button" id="next-1" class="btn btn-primary">Next</button>
+                <a href="/Workshops" class="btn btn-link">Cancel</a>
+            </div>
+        </div>
+
+        <div id="step-2" class="wizard-step d-none">
+            <div class="mb-3">
+                <label class="form-label">Date & time</label>
+                <input name="ScheduledAt" type="datetime-local" class="form-control" required />
+            </div>
+            <div>
+                <button type="button" id="prev-2" class="btn btn-outline-secondary">Back</button>
+                <button type="button" id="next-2" class="btn btn-primary">Next</button>
+            </div>
+        </div>
+
+        <div id="step-3" class="wizard-step d-none">
+            <div class="mb-3">
+                <label class="form-label">Type</label>
+                <select id="type-select" name="Type" class="form-select" required>
+                    <option value="presentiel">Presentiel</option>
+                    <option value="online">Online</option>
+                </select>
+            </div>
+            <div id="presentiel-fields" class="mb-3 d-none">
+                <label class="form-label">Location</label>
+                <input name="LocationOrLink" class="form-control" />
+            </div>
+            <div id="online-fields" class="mb-3 d-none">
+                <label class="form-label">Google Meet link</label>
+                <input name="LocationOrLink" class="form-control" />
+            </div>
+            <div>
+                <button type="button" id="prev-3" class="btn btn-outline-secondary">Back</button>
+                <button type="submit" class="btn btn-success">Schedule & Generate Mail</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+            const step1 = document.getElementById('step-1');
+            const step2 = document.getElementById('step-2');
+            const step3 = document.getElementById('step-3');
+            const next1 = document.getElementById('next-1');
+            const next2 = document.getElementById('next-2');
+            const prev2 = document.getElementById('prev-2');
+            const prev3 = document.getElementById('prev-3');
+            const typeSelect = document.getElementById('type-select');
+            const pres = document.getElementById('presentiel-fields');
+            const online = document.getElementById('online-fields');
+
+            next1?.addEventListener('click', () => { step1.classList.add('d-none'); step2.classList.remove('d-none'); });
+            next2?.addEventListener('click', () => { step2.classList.add('d-none'); step3.classList.remove('d-none'); });
+            prev2?.addEventListener('click', () => { step2.classList.add('d-none'); step1.classList.remove('d-none'); });
+            prev3?.addEventListener('click', () => { step3.classList.add('d-none'); step2.classList.remove('d-none'); });
+
+            function updateType(){
+                if(typeSelect.value === 'presentiel'){
+                    pres.classList.remove('d-none');
+                    online.classList.add('d-none');
+                } else {
+                    pres.classList.add('d-none');
+                    online.classList.remove('d-none');
+                }
+            }
+            updateType();
+            typeSelect?.addEventListener('change', updateType);
+        })();
+    </script>
+}

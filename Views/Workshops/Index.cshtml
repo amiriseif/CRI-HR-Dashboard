@@ -1,0 +1,90 @@
+@model IEnumerable<HRDashboard.Models.Workshop>
+
+@{
+    ViewData["Title"] = "Workshops";
+}
+
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Workshops</h3>
+        <a class="btn btn-primary" href="/Workshops/Create">Schedule Workshop</a>
+    </div>
+
+    @if(TempData["Success"] != null){
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Subject</th>
+                    <th>Trainer</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Details</th>
+                    <th>Mail Subject</th>
+                    <th>Mail</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var w in Model){
+                    <tr>
+                        <td>@w.Subject</td>
+                        <td>@w.Trainer</td>
+                        <td>@w.ScheduledAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@w.Type</td>
+                        <td>@w.LocationOrLink</td>
+                        <td>@(string.IsNullOrWhiteSpace(w.MailSubject) ? "-" : (w.MailSubject.Length > 60 ? w.MailSubject.Substring(0, 60) + "..." : w.MailSubject))</td>
+                        <td>
+                            @if(string.IsNullOrWhiteSpace(w.MailBody)){
+                                <span class="text-muted">-</span>
+                            } else {
+                                <button type="button" class="btn btn-sm btn-outline-primary preview-mail-btn" data-mail-id="@w.Id">Preview</button>
+                                <div class="d-none mail-body" id="mail-body-@w.Id">@Html.Raw(System.Net.WebUtility.HtmlEncode(w.MailBody))</div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Mail preview modal -->
+<div class="modal fade" id="mailPreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Mail Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 id="mailPreviewSubject"></h6>
+        <hr />
+        <div id="mailPreviewBody" style="white-space:pre-wrap;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.preview-mail-btn').forEach(function(btn){
+            btn.addEventListener('click', function(){
+                var id = btn.getAttribute('data-mail-id');
+                var bodyEl = document.getElementById('mail-body-' + id);
+                var body = bodyEl ? bodyEl.textContent : '';
+                var subject = bodyEl && bodyEl.previousElementSibling ? bodyEl.previousElementSibling.textContent : '';
+                // fill modal
+                document.getElementById('mailPreviewSubject').textContent = '';
+                document.getElementById('mailPreviewBody').textContent = body || '';
+                var modal = new bootstrap.Modal(document.getElementById('mailPreviewModal'));
+                modal.show();
+            });
+        });
+    });
+</script>

@@ -1,0 +1,297 @@
+﻿@model HRDashboard.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register - Robotique Club ISAMM HR";
+    Layout = null;
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+    :root {
+        --primary: #0d1b4c;
+        --primary-dark: #081336;
+        --accent: #00aaff;
+        --text-light: #d0e0ff;
+        --card-bg: #121a42;
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        color: var(--text-light);
+        min-height: 100vh;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .register-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+    }
+
+    .register-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(0, 170, 255, 0.15);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        max-width: 460px;
+        width: 100%;
+    }
+
+    .register-header {
+        background: linear-gradient(90deg, var(--primary), #1a2a6c);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+    }
+
+    .club-logo {
+        width: 110px;
+        height: 110px;
+        object-fit: contain;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 4px 10px rgba(0, 170, 255, 0.4));
+    }
+
+    .form-control, .form-select {
+        background-color: rgba(255,255,255,0.07);
+        border: 1px solid rgba(0, 170, 255, 0.3);
+        color: white;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(255,255,255,0.12);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 0.25rem rgba(0, 170, 255, 0.25);
+        color: white;
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        border: none;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        background: #0095e6;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 170, 255, 0.35);
+    }
+
+    .profile-picture-preview {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid var(--accent);
+        margin: 0 auto 1rem;
+        background: #0a1438;
+        box-shadow: 0 0 20px rgba(0, 170, 255, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-picture-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .text-link {
+        color: var(--accent);
+        text-decoration: none;
+    }
+
+    .text-link:hover {
+        color: #4dd0ff;
+        text-decoration: underline;
+    }
+
+    .form-text {
+        color: rgba(255,255,255,0.55);
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <div class="register-header">
+            <img src="/images/robotique-club-isamm-logo.png" alt="Robotique Club ISAMM" class="club-logo" />
+            <h2 class="text-white mb-0">Create Account</h2>
+            <p class="mb-0 mt-2 text-white-50">Robotique Club ISAMM • HR Dashboard</p>
+        </div>
+
+        <div class="p-4 p-md-5">
+            <form asp-action="Index" method="post" enctype="multipart/form-data" class="needs-validation">
+                @Html.AntiForgeryToken()
+
+                <div class="text-center mb-4">
+                    <div class="profile-picture-preview">
+                        <img id="profilePreview"
+                             src="https://placehold.co/140x140/0a1438/ffffff/png?text=Profile+Photo"
+                             alt="Profile preview" />
+                    </div>
+
+                    <div class="mb-2">
+                        <input asp-for="ProfileImage"
+                               class="form-control"
+                               type="file"
+                               id="profilePictureInput"
+                               accept="image/jpeg,image/png,image/gif,image/webp"
+                               onchange="previewProfilePicture(this)" />
+                    </div>
+
+                    <small class="form-text d-block">Optional • Max 5MB • JPG, PNG, WebP</small>
+                    <span asp-validation-for="ProfileImage" class="text-danger d-block mt-1"></span>
+                </div>
+
+                <!-- rest of the form fields unchanged -->
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label"></label>
+                    <input asp-for="Username" class="form-control" placeholder="Username" required />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label"></label>
+                    <input asp-for="FullName" class="form-control" placeholder="Full name" required />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Password" required />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Confirm password" required />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="SelectedRole" class="form-label"></label>
+                    <select asp-for="SelectedRole" class="form-select" required>
+                        <option value="">-- Select your role --</option>
+                        <option value="Bureau Superieur">Bureau Supérieur</option>
+                        <option value="RH manager">RH Manager</option>
+                    </select>
+                    <span asp-validation-for="SelectedRole" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="mb-0">
+                    Already have an account?
+                    <a asp-controller="Login" asp-action="Index" class="text-link">Sign in here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+@{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+<script>
+    // This function is global so inline onchange can call it
+    function previewProfilePicture(input) {
+        const preview = document.getElementById('profilePreview');
+        if (!preview) return;
+
+        if (!input.files || input.files.length === 0) {
+            preview.src = "https://placehold.co/140x140/0a1438/ffffff/png?text=Profile+Photo";
+            return;
+        }
+
+        const file = input.files[0];
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert("File size exceeds 5MB limit!");
+            input.value = '';
+            preview.src = "https://placehold.co/140x140/0a1438/ffffff/png?text=Profile+Photo";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+        };
+        reader.onerror = function () {
+            console.error("FileReader failed");
+            preview.src = "https://placehold.co/140x140/0a1438/ffffff/png?text=Error";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // All other initialization code stays inside DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form.needs-validation');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (!form || !submitBtn) return;
+
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.6';
+        submitBtn.style.cursor = 'not-allowed';
+
+        function updateSubmitButton() {
+            const html5Valid = form.checkValidity();
+            const validator = (window.jQuery && $(form).data) ? $(form).data('validator') : null;
+            const jqueryValid = !validator || (typeof validator.form === 'function' ? validator.form() : true);
+
+            const isValid = html5Valid && jqueryValid;
+
+            submitBtn.disabled = !isValid;
+            submitBtn.style.opacity = isValid ? '1' : '0.6';
+            submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+        }
+
+        const inputs = form.querySelectorAll('input, select');
+        inputs.forEach(el => {
+            el.addEventListener('input', updateSubmitButton);
+            el.addEventListener('change', updateSubmitButton);
+            el.addEventListener('blur', updateSubmitButton);
+        });
+
+        updateSubmitButton();
+
+        form.addEventListener('submit', function (e) {
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return false;
+            }
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.8';
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Creating...';
+        });
+
+        // Password match check
+        const password = document.querySelector('input[asp-for="Password"]');
+        const confirm = document.querySelector('input[asp-for="ConfirmPassword"]');
+        if (password && confirm) {
+            const checkMatch = () => {
+                if (confirm.value === '') {
+                    confirm.setCustomValidity('');
+                    return;
+                }
+                confirm.setCustomValidity(
+                    password.value === confirm.value ? '' : "Passwords do not match."
+                );
+            };
+            password.addEventListener('input', checkMatch);
+            confirm.addEventListener('input', checkMatch);
+        }
+    });
+</script>

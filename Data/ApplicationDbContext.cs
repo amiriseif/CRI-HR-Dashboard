@@ -10,5 +10,8 @@ namespace HRDashboard.Data
             : base(options)
         {
         }
+        public DbSet<Models.SheetMember>? SheetMembers { get; set; }
+        public DbSet<Models.Tasks>? Tasks { get; set; }
+        public DbSet<Models.Workshop>? Workshops { get; set; }
     }
 }
